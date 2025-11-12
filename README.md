@@ -1,150 +1,136 @@
-# **EXP4: 4-bit Ripple Carry Adder using Task and 4-bit Ripple Counter using Function with Testbench**
+# 4-bit-Ripple-counter-using-Function-and-4-bit-Ripple-Adder-using-task
 
----
+# Aim
+To design and simulate a 4-bit-Ripple-counter-using-Function-and-4-bit-Ripple-Adder-using-task using Verilog HDL, and verify its functionality through a testbench in the Vivado 2023.1 environment. 
 
-## **Aim**
-To design, simulate, and verify a **4-bit Ripple Carry Adder** using **Task** and a **4-bit Ripple Counter** using **Function** in Verilog HDL.
+# Apparatus Required
+Vivado 2023.1
+# Procedure
+1. Launch Vivado 2023.1
+Open Vivado and create a new project.
+2. Design the Verilog Code
+Write the Verilog code for the seven-segment display, defining the logic that maps a 4-bit binary input to the corresponding segments (a to g) of the display.
+3. Create the Testbench
+Write a testbench to simulate the seven-segment display behavior. The testbench should apply various 4-bit input values and monitor the corresponding output.
+4. Create the Verilog Files
+Create both the design module and the testbench in the Vivado project.
+5. Run Simulation
+Run the behavioral simulation to verify the output. 
+6. Observe the Waveforms
+Analyze the output waveforms in the simulation window, and verify that the correct segments light up for each digit.
+7. Save and Document Results
+Capture screenshots of the waveform and save the simulation logs. These will be included in the lab report.
 
----
+# Verilog Code
 
-## **Apparatus Required**
-- System with **Vivado Design Suite**
----
+# 4 bit Ripple Adder using Task
+```
+`timescale 1ns/1ps 
+module rca4(a,b,cin,sum,cout);
+input [3:0] a,b;
+input cin;
+output reg [3:0] sum;
+output reg cout;
+reg [4:0] temp;
+task ripple_add;
+input [3:0] x,y;
+input c_in;
+output [3:0] s;
+output c_out;
+reg [4:0] t;
+begin
+t = x + y + c_in; 
+s = t[3:0];
+c_out = t[4];
+end
+endtask
+always @(*) begin
+ripple_add(a,b,cin,sum,cout);
+end
+endmodule
 
-## **Theory**
-### **Ripple Carry Adder**
-A 4-bit Ripple Carry Adder (RCA) adds two 4-bit binary numbers by cascading four full adders. The carry-out of each full adder acts as the carry-in for the next stage. Using a **task** in Verilog, the addition operation can be modularized for each bit.
-<img width="692" height="268" alt="image" src="https://github.com/user-attachments/assets/b70c348a-049a-4462-88a4-ad6905446cf4" />
+```
+
+# Test Bench
+```
+module tb_rca4;
+reg [3:0] a,b;
+reg cin;
+wire [3:0] sum;
+wire cout;
+rca4 uut(a,b,cin,sum,cout);
+initial begin
+$monitor("T=%0t | a=%b | b=%b | cin=%b | sum=%b | cout=%b",$time,a,b,cin,sum,cout);
+a=4'b1010; b=4'b0101; cin=0;
+#10;
+a=4'b1111; b=4'b0001; cin=1;
+#10;
+a=4'b1001; b=4'b0110; cin=0;
+#10;
+a=4'b1110; b=4'b1111; cin=1;
+#10;
+end
+endmodule
+
+```
+
+# Output Waveform
 
 
-### **Ripple Counter**
-A Ripple Counter is a sequential circuit that counts in binary. In a 4-bit ripple counter, the output of one flip-flop serves as the clock input for the next flip-flop. Using a **function** in Verilog allows the counting logic to be encapsulated and reused.
-
-<img width="1024" height="768" alt="image" src="https://github.com/user-attachments/assets/fa8730fc-e48e-477a-b2e3-6697a95355d3" />
-
----
-
-## **Program**
-
-### **4-bit Ripple Carry Adder using Task**
-
-```verilog
-// 4-bit Ripple Carry Adder using Task
-module ripple_carry_adder_task(
-    input [3:0] A, B,
-    output [3:0] SUM,
-    output COUT
-);
-    reg [3:0] sum_temp;
-    reg cout_temp;
-
-    task full_adder;
-        input a, b, cin;
-        output s, cout;
-        begin
-            s = a ^ b ^ cin;
-            cout = (a & b) | (b & cin) | (a & cin);
-        end
-    endtask
+<img width="1920" height="1080" alt="Screenshot (105)" src="https://github.com/user-attachments/assets/2abb7a03-d73d-4299-a89d-b652de54c945" />
 
 
 
+# 4 bit Ripple counter using Function
+```
 
+`timescale 1ns / 1ps
 
+module ripple_counter_4bit(clk, rst, q);
+input clk, rst;
+output reg [3:0] q;
 
-Type the Program
+function [3:0] i;
+input [3:0] data;
+begin
+i = data + 1;
+end
+endfunction
 
-
-
+always @(posedge clk or posedge rst) begin
+if (rst)
+q <= 4'b0000;
+else
+q <= i(q);
+end
 endmodule
 ```
 
-### **Test bench 4-bit Ripple Carry Adder using Task**
+# Test Bench
 ```
-module tb_ripple_carry_adder_task;
-    reg [3:0] A, B;
-    wire [3:0] SUM;
-    wire COUT;
-
-    ripple_carry_adder_task uut (A, B, SUM, COUT);
-
-    initial begin
-
-
-
-
-        $finish;
-    end
+module tb_ripple_counter_4bit;
+reg clk, rst;
+wire [3:0] q;
+ripple_counter_4bit uut(clk, rst, q);
+always #5 clk = ~clk;
+initial begin
+$monitor("T=%0t | rst=%b | q=%b (%0d)", $time, rst, q, q);
+clk = 0;
+rst = 1;  
+#10 rst = 0; 
+#100;
+$finish;
+end
 endmodule
 ```
-### 4-bit Ripple Carry Adder Simulation Output 
 
------
------
------
------
-------- Paste the output here----------
+
+# Output Waveform 
+
+<img width="1920" height="1080" alt="Screenshot (106)" src="https://github.com/user-attachments/assets/29d3364c-8075-433e-8823-ae1b80ee75dc" />
 
 
 
 
-
-
-
-
-
-### **4-bit Ripple Counter using Function**
-```
-// 4-bit Ripple Counter using Function
-module ripple_counter_func(
-    input clk, reset,
-    output reg [3:0] count
-);
-    function [3:0] increment;
-        input [3:0] val;
-        begin
-            increment = val + 1;
-        end
-    endfunction
-
-
-
-
-
-endmodule
-```
-### **Testbench for 4-bit Ripple Counter using Function**
-```
-module tb_ripple_counter_func;
-    reg clk, reset;
-    wire [3:0] count;
-
-    ripple_counter_func uut (clk, reset, count);
-
-    initial begin
-        clk = 0;
-        forever #5 clk = ~clk; // Clock with 10ns period
-    end
-
-    initial begin
-     
-    end
-endmodule
-```
-### 4-bit Ripple Counter Simulation output 
------
------
------
------
-------- Paste the output here----------
-
-
-
-
-
-
-
-### Result
-
-The simulation of the 4-bit Ripple Carry Adder using Task and 4-bit Ripple Counter using Function was successfully carried out in Vivado Design Suite.
-Both designs produced correct functional outputs as verified by waveform and console output.
+# Conclusion
+In this experiment, a 4-bit-Ripple-counter-using-Function-and-4-bit-Ripple-Adder-using-task was successfully designed and simulated using Verilog HDL.
